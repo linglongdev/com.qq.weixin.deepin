@@ -1,0 +1,39 @@
+version: "1"  
+  
+package:  
+  id: com.qq.weixin.deepin  
+  name: com.qq.weixin.deepin  
+  version: 1.0.0.0  
+  kind: app  
+  description: |  
+      com.qq.weixin.deepin  3.9.10deepin6  amd64  
+  
+base: org.deepin.base.wine/23.2.0.5
+runtime: org.deepin.runtime.wine/23.2.1.4
+  
+command:  
+  - /opt/apps/com.qq.weixin.deepin/files/run.sh  
+
+sources:
+  - kind: file
+    url: https://aptly.uniontech.com/pkg/nonfree-eagle/release-candidate/d2luZTgtcnVudGltZTIyMDI0LTA5LTAzIDEzOjE1OjAx/pool/non-free/c/com.qq.weixin.deepin/com.qq.weixin.deepin_3.9.10deepin6_amd64.deb
+    digest: 04e582b3eb79392f9ffced5acb63c0f4a6d65d1a1e6e86cc079d6884e11539a2
+  
+build: |  
+  set -x  
+  SOURCES="linglong/sources"  
+  dpkg-deb -x $SOURCES/com.qq.weixin.deepin_3.9.10deepin6_amd64.deb $SOURCES/com.qq.weixin.deepin  
+  rm -rf $SOURCES/com.qq.weixin.deepin/opt/apps/com.qq.weixin.deepin/files/dlls/wineserver
+  # run.sh替换  
+  FILE_PATH="$SOURCES/com.qq.weixin.deepin/opt/apps/com.qq.weixin.deepin/files/run.sh"  
+  sed -i -e 's|/opt/deepin-wine8-stable|/runtime/deepin-wine8-stable|g' "$FILE_PATH"  
+  sed -i -e 's|/opt/deepin-wine6-stable|/runtime/deepin-wine6-stable|g' "$FILE_PATH"  
+  sed -i -e 's|/opt/deepinwine|/runtime/deepinwine|g' "$FILE_PATH"  
+  sed -i -e 's|/opt/deepin-box86|/runtime/deepin-box86|g' "$FILE_PATH"  
+  sed -i -e 's|BOTTLEPATH="$HOME/.deepinwine/$BOTTLENAME"|BOTTLEPATH="$HOME/.linglong/$BOTTLENAME"|g' "$FILE_PATH"  
+  
+  install -d $PREFIX/share  
+  install -d $PREFIX/bin  
+  # move files  
+  cp -r $SOURCES/com.qq.weixin.deepin/opt/apps/com.qq.weixin.deepin/entries/* $PREFIX/share  
+  cp -r $SOURCES/com.qq.weixin.deepin/opt/apps/com.qq.weixin.deepin/files/* $PREFIX  
